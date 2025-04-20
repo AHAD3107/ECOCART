@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Card from '../components/Card';
 import Header from '../components/Header';
+import Products from './Products';
 
 const Home = () => {
+  const [products, setProducts] = useState([]);
+
+  
+
   return (
     <>
       <Header />
-      <div style={{ paddingTop: "80px" }}>
-        <h1 className="text-2xl text-center mt-10">This is the Home Page</h1>
-      </div>
+      <Products />
+      
     </>
   );
 };

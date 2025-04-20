@@ -7,15 +7,37 @@ const Chatbot = () => {
 
   const API_KEY = import.meta.env.VITE_API_KEY
 
+  const allowedKeywords = [
+    'eco', 'green', 'recycle', 'sustainability', 'carbon',
+    'environment', 'pollution', 'plastic', 'organic',
+    'biodegradable', 'climate', 'footprint', 'save earth',
+    'save water', 'save energy','thank you','bamboo brush'
+  ];
+  
+  function isEcoFriendly (question){
+    const LowerQ=question.toLowerCase();
+    return allowedKeywords.some(keyword => LowerQ.includes(keyword));
+  }
+
+  
+  
+
   async function generateAnswer() {
-    if (!question.trim()) return
+    if (!question.trim()) {
+        return;
+    }
+
+    if (!isEcoFriendly(question)) {
+        setMessages((prev) => [...prev, { type: 'bot', text: "Please ask questions related to eco-friendly or sustainable topics 🌿" }]);
+        return;
+      }
 
     const userMsg = { type: "user", text: question }
     setMessages((prev) => [...prev, userMsg])
 
     try {
       const response = await axios({
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBWpIf3ePza9-JBTUXHFH9YWAIJXgTbqKyrQ`,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCiqB0TdX01BHRUQLurw_qqA_I-PPcxbHI`,
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

@@ -8,6 +8,10 @@ import Signup from './pages/Signup'
 import Home from './pages/Home'
 import Header from './components/Header'
 import Help from './pages/Help'
+// import Details from './pages/Details';
+import Pd from './pages/Pd'
+import Wishlist from './pages/Wishlist'
+import Account from './pages/Account'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 
@@ -26,6 +30,12 @@ function App() {
         <Route path="/signup" element={<Signup />}  />
         <Route path="/login" element={<Login />} />
         <Route path="/help" element={<Help/>}></Route>
+        {/* <Route path="/details/:id" element={<Details/>}></Route> */}
+        <Route path="/product/:id" element={<Pd />} />
+
+        <Route path='/pd' element={<Pd/>}></Route>
+        <Route path='/wishlist' element={<Wishlist/>}/>
+        <Route path='/account' element={<Account/>}/>
       </Routes>
     </Router>
   )
