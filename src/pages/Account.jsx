@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Account = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const { currentUser } = useAuth();
   const [wishlist, setWishlist] = useState([]);
   const [totalEcoScore, setTotalEcoScore] = useState(0);
 
@@ -29,27 +30,24 @@ const Account = () => {
   };
 
   useEffect(() => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser) {
+    if (!currentUser) {
       navigate('/login');
       return;
     }
 
-    setUser(JSON.parse(storedUser));
-    
-    // Get wishlist items
+    // Get wishlist items from localStorage
     const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
     setWishlist(storedWishlist);
     setTotalEcoScore(calculateTotalScore(storedWishlist));
-  }, [navigate]);
+  }, [currentUser, navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('wishlist');
+    navigate('/');
   };
 
-  if (!user) {
+  if (!currentUser) {
     return null;
   }
 
@@ -60,27 +58,31 @@ const Account = () => {
         <div className="max-w-4xl mx-auto">
           {/* User Profile Section */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-2xl font-bold mb-4">Profile Information</h2>
-            <div className="space-y-4">
+            <div className="flex justify-between items-start">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Username</label>
-                <p className="mt-1 text-lg">{user.username || 'Not set'}</p>
+                <h2 className="text-2xl font-bold mb-4">Profile Information</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Username</label>
+                    <p className="mt-1 text-lg">{currentUser.username || 'Not set'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <p className="mt-1 text-lg">{currentUser.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
+                    <p className="mt-1 text-lg">{currentUser.mobileNumber || 'Not set'}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email</label>
-                <p className="mt-1 text-lg">{user.email}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
-                <p className="mt-1 text-lg">{user.mobileNumber || 'Not set'}</p>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Logout
+              </button>
             </div>
-            <button
-              onClick={handleLogout}
-              className="mt-6 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
-            >
-              Logout
-            </button>
           </div>
 
           {/* Wishlist Section */}

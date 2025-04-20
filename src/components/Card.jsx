@@ -1,32 +1,51 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Card = ({ product, ecoScore, carbonFootprint, allProducts }) => {
   const [showModal, setShowModal] = useState(false);
   const [comparedProduct, setComparedProduct] = useState(null);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    // Get existing wishlist from localStorage
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    
+    // Check if product is already in wishlist
+    const isAlreadyInWishlist = existingWishlist.some(item => item.id === product.id);
+    
+    if (!isAlreadyInWishlist) {
+      // Add product to wishlist with eco score and carbon footprint
+      const productWithEcoData = {
+        ...product,
+        ecoScore: getEco(product.material).ecoScore,
+        carbonFootprint: getEco(product.material).carbonFootprint
+      };
+      
+      const updatedWishlist = [...existingWishlist, productWithEcoData];
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      alert('Product added to wishlist!');
+    } else {
+      alert('Product is already in your wishlist!');
+    }
+  };
+
   const handleViewDetails = () => {
     const pair = getComparisonProduct(product, allProducts);
     setComparedProduct(pair);
     setShowModal(true);
   };
 
-  // const handleKeepChosen = () => {
-  //   alert(`${product.title} chosen!`);
-  //   setShowModal(false);
-  // };
-
   const handleClickChosen = () => {
-  const isEcoFriendly = ecoScore >= 7 || carbonFootprint <= 500;
-
-  navigate('/pd', {
-    state: {
-      product,
-      isEcoFriendly,
-    },
-  });
-  setShowModal(false); // Optional: hide modal on navigate
-};
+    const isEcoFriendly = ecoScore >= 7 || carbonFootprint <= 500;
+    navigate('/pd', {
+      state: {
+        product,
+        isEcoFriendly,
+      },
+    });
+    setShowModal(false);
+  };
 
   // Comparison logic
   const getComparisonProduct = (mainProduct, products) => {
@@ -41,37 +60,73 @@ const Card = ({ product, ecoScore, carbonFootprint, allProducts }) => {
     return products.find((p) => p.title === matchTitle);
   };
 
+  const getEcoColor = (score) => {
+    if (score >= 8) return 'bg-green-500';
+    if (score >= 5) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
   return (
     <>
-      <div className="bg-white shadow-lg rounded-lg p-4 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-2xl">
-        <img src={product.image} alt={product.title} className="w-full h-48 object-contain rounded-lg" />
-        <h2 className="text-xl font-semibold mt-4">{product.title}</h2>
-        <p className="text-gray-600">{product.description}</p>
-
-        {/* Eco Score */}
-        <div className="mt-4">
-          
-          <div className="flex flex-col items-start space-y-2">
-            Ecoscore
-            <div className="flex items-center space-x-2 w-full">
-              <div className={`h-2 ${ecoScore >= 7 ? 'bg-green-500' : ecoScore >= 4 ? 'bg-yellow-500' : 'bg-red-500'} w-32`}></div>
-              <span className="text-sm text-gray-700">{ecoScore}</span>
-            </div>
-
-            {/* Carbon Footprint */}
-            Carbon Footprint
-            <div className="flex items-center space-x-2 w-full">
-              
-              <div className={`h-2 ${carbonFootprint <= 500 ? 'bg-green-500' : carbonFootprint <= 1000 ? 'bg-yellow-500' : 'bg-red-500'} w-32`}></div>
-              <span className="text-sm text-gray-700">{carbonFootprint} gCO2</span>
+      <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+        {/* Product Image */}
+        <div className="relative h-48 overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.title}
+            className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
+          />
+          <div className="absolute top-4 right-4">
+            <div className={`${getEcoColor(ecoScore)} text-white px-3 py-1 rounded-full text-sm font-semibold`}>
+              Eco Score: {ecoScore}/10
             </div>
           </div>
         </div>
 
-        {/* View Details */}
-        <button onClick={handleViewDetails} className="bg-green-500 text-white py-2 px-4 rounded-lg mt-4 w-full">
-          View Details
-        </button>
+        {/* Product Info */}
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-2">{product.title}</h3>
+          <p className="text-gray-600 mb-4">{product.description}</p>
+          
+          {/* Price and Carbon Footprint */}
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-2xl font-bold text-green-600">${product.price}</span>
+            <div className="flex items-center text-gray-600">
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              {carbonFootprint}kg CO₂
+            </div>
+          </div>
+
+          {/* Material Badge */}
+          <div className="flex items-center mb-4">
+            <span className="text-sm font-medium text-gray-500">Material:</span>
+            <span className="ml-2 px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700">
+              {product.material.charAt(0).toUpperCase() + product.material.slice(1)}
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleAddToCart}
+              className="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition-colors"
+            >
+              Add to Cart
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleViewDetails}
+              className="flex-1 border border-green-500 text-green-500 py-2 px-4 rounded-lg font-medium hover:bg-green-50 transition-colors"
+            >
+              Learn More
+            </motion.button>
+          </div>
+        </div>
       </div>
 
       {/* Modal */}

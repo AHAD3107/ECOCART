@@ -13,6 +13,7 @@ import Pd from './pages/Pd'
 import Wishlist from './pages/Wishlist'
 import Account from './pages/Account'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
 
 
 function App() {
@@ -23,21 +24,23 @@ function App() {
     //   {/* <Login></Login> */}
     //   <Signup></Signup>
     // </>
-    <Router>
-      <Routes>
-        <Route path='/' element={<Splash />}></Route>
-        <Route path='/home' element={<Home />}>Home</Route>
-        <Route path="/signup" element={<Signup />}  />
-        <Route path="/login" element={<Login />} />
-        <Route path="/help" element={<Help/>}></Route>
-        {/* <Route path="/details/:id" element={<Details/>}></Route> */}
-        <Route path="/product/:id" element={<Pd />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Splash />}></Route>
+          <Route path='/home' element={<Home />}>Home</Route>
+          <Route path="/signup" element={<Signup />}  />
+          <Route path="/login" element={<Login />} />
+          <Route path="/help" element={<Help/>}></Route>
+          {/* <Route path="/details/:id" element={<Details/>}></Route> */}
+          <Route path="/product/:id" element={<Pd />} />
 
-        <Route path='/pd' element={<Pd/>}></Route>
-        <Route path='/wishlist' element={<Wishlist/>}/>
-        <Route path='/account' element={<Account/>}/>
-      </Routes>
-    </Router>
+          <Route path='/pd' element={<Pd/>}></Route>
+          <Route path='/wishlist' element={<Wishlist/>}/>
+          <Route path='/account' element={<Account/>}/>
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
 
